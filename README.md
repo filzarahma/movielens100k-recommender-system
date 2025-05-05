@@ -88,7 +88,7 @@ Dataset terdiri dari beberapa file, namun dalam proyek ini saya berfokus pada du
 
 #### 2. Distribusi Rating
 
-![Distribution of Movie Ratings](![image](https://github.com/user-attachments/assets/5b9c1522-c080-4256-a320-7ff3cdd223e8))
+![image](https://github.com/user-attachments/assets/5b9c1522-c080-4256-a320-7ff3cdd223e8)
 
 Distribusi rating film menunjukkan bahwa mayoritas pengguna cenderung memberikan rating positif, dengan puncak tertinggi pada rating 4.0, diikuti oleh 3.0 dan 5.0. Rating rendah seperti 0.5 hingga 2.0 jarang diberikan. Rata-rata rating berada di angka 3.5, menunjukkan adanya kecenderungan pengguna untuk menilai film secara positif.
 
