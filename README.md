@@ -88,25 +88,28 @@ Dataset terdiri dari beberapa file, namun dalam proyek ini saya berfokus pada du
 
 #### 2. Distribusi Rating
 
-![Distribution of Movie Ratings](https://i.imgur.com/XFqHtXE.png)
+![Distribution of Movie Ratings](![image](https://github.com/user-attachments/assets/5b9c1522-c080-4256-a320-7ff3cdd223e8))
 
 Distribusi rating film menunjukkan bahwa mayoritas pengguna cenderung memberikan rating positif, dengan puncak tertinggi pada rating 4.0, diikuti oleh 3.0 dan 5.0. Rating rendah seperti 0.5 hingga 2.0 jarang diberikan. Rata-rata rating berada di angka 3.5, menunjukkan adanya kecenderungan pengguna untuk menilai film secara positif.
 
 #### 3. Distribusi Genre
 
-![Top 15 Movie Genres](https://i.imgur.com/wJRlbpi.png)
+![image](https://github.com/user-attachments/assets/195a0415-7ace-405c-924a-33038e169718)
+![image](https://github.com/user-attachments/assets/eab5f5b5-8815-40c5-bc98-30f70869290e)
+
 
 Genre film yang paling banyak diproduksi adalah Drama dan Comedy, masing-masing dengan lebih dari 4000 dan 3500 film. Genre Thriller, Action, dan Romance juga cukup populer. Sebagian besar film memiliki 1 hingga 3 genre, dengan jumlah film menurun drastis seiring bertambahnya jumlah genre.
 
 #### 4. Distribusi Tahun Rilis
 
-![Movie Release Year Distribution](https://i.imgur.com/qTfx3d1.png)
+![image](https://github.com/user-attachments/assets/ddb0b53e-5f42-4463-b259-7c432b19025b)
+
 
 Produksi film meningkat secara signifikan sejak tahun 1980-an dan mencapai puncaknya sekitar tahun 2000-an. Grafik ini mencerminkan tren pertumbuhan industri perfilman modern yang pesat dalam beberapa dekade terakhir.
 
 #### 5. Analisis Rating Berdasarkan Genre
 
-![Rating Rata-rata berdasarkan Genre](https://i.imgur.com/R2mFdLJ.png)
+![image](https://github.com/user-attachments/assets/a58b8a48-507d-48fd-8a1e-c14261746a59)
 
 Genre Film-Noir menempati posisi teratas dengan rata-rata rating tertinggi, disusul oleh War dan Documentary. Sebaliknya, genre Horror, Comedy, dan Children berada di posisi terbawah. Film dengan genre serius cenderung lebih dihargai dibanding genre yang lebih ringan.
 
@@ -116,43 +119,9 @@ Dalam tahap data preparation, saya melakukan beberapa transformasi dan pembersih
 
 ### 1. Eksplorasi Dasar dan Pemeriksaan Data
 
-```python
-# Eksplorasi data dasar untuk film
-print("Movie dataset information:")
-print(movies_df.info(), '\n')
-
-# Memeriksa apakah ada data duplikat dalam dataset film
-print("Number of duplicated data in movie dataset:")
-print(movies_df.duplicated().sum(),'\n')
-
-# Memeriksa nilai yang hilang (missing value) pada dataset rating
-print("Number of missing value in movie dataset:")
-print(movies_df.isna().sum())
-```
-
 Tahapan ini penting untuk memastikan kualitas data yang akan digunakan. Hasil menunjukkan bahwa kedua dataset (film dan rating) tidak memiliki data duplikat atau nilai yang hilang, sehingga tidak diperlukan penanganan khusus untuk masalah tersebut.
 
 ### 2. Feature Engineering
-
-```python
-# Ekstrak tahun dari judul film
-def extract_year(title):
-    pattern = r'\((\d{4})\)'
-    match = re.search(pattern, title)
-    if match:
-        return int(match.group(1))
-    else:
-        return None
-
-movies_df['year'] = movies_df['title'].apply(extract_year)
-
-# Menambahkan informasi rating rata-rata ke dataframe film
-movie_ratings = ratings_df.groupby('movieId')['rating'].agg(['mean', 'count']).reset_index()
-movies_with_ratings = pd.merge(movies_df, movie_ratings, on='movieId', how='left')
-
-# Menghitung jumlah genre untuk setiap film
-movies_df['genre_count'] = movies_df['genres'].apply(lambda x: len(x.split('|')))
-```
 
 Tahapan feature engineering dilakukan untuk memperkaya informasi dalam dataset:
 
