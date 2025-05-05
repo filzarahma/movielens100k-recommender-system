@@ -172,19 +172,8 @@ def recommend_content(title, movies, cosine_sim=cosine_sim, movie_indices=movie_
 ```
 
 **Hasil Top-N Rekomendasi untuk "Toy Story (1995)":**
+![image](https://github.com/user-attachments/assets/a81618c3-0e11-4681-a2f4-7c2612d58c8c)
 
-| Title | Genres | Similarity |
-|-------|--------|------------|
-| Beauty and the Beast (1991) | Animation\|Children's\|Musical | 1.0 |
-| Angels in the Outfield (1994) | Children's\|Comedy | 0.707 |
-| Jungle Book, The (1994) | Adventure\|Children's\|Romance | 0.577 |
-| Lion King, The (1994) | Animation\|Children's\|Musical | 0.577 |
-| Aladdin (1992) | Animation\|Children's\|Comedy\|Musical | 0.5 |
-| Snow White and the Seven Dwarfs (1937) | Animation\|Children's\|Musical | 0.5 |
-| Little Mermaid, The (1989) | Animation\|Children's\|Musical | 0.5 |
-| Dumbo (1941) | Animation\|Children's | 0.5 |
-| Alice in Wonderland (1951) | Animation\|Children's | 0.5 |
-| James and the Giant Peach (1996) | Animation\|Children's | 0.5 |
 
 Model ini juga dapat digunakan untuk memberikan rekomendasi personalisasi berdasarkan seluruh riwayat rating pengguna:
 
@@ -221,6 +210,9 @@ def recommend_for_user(user_id, movies, ratings, cosine_sim, top_n=10):
     
     return pd.DataFrame(recommendations)
 ```
+**Hasil Top-N Rekomendasi untuk userId 255:**
+![image](https://github.com/user-attachments/assets/80169726-65b7-43f8-b445-cbb9f4deef92)
+
 
 ### 2. Collaborative Filtering
 
@@ -273,17 +265,8 @@ def recommend_movies(user_id_original, model, movie_df, top_n=10):
 ```
 
 **Hasil Top-N Rekomendasi untuk User 255:**
+![image](https://github.com/user-attachments/assets/b46a5a70-554b-4f14-8f20-98f3e7475ed6)
 
-1. Pulp Fiction (1994)
-2. Silence of the Lambs, The (1991)
-3. Star Wars (1977)
-4. Fargo (1996)
-5. Godfather, The (1972)
-6. Shawshank Redemption, The (1994)
-7. Schindler's List (1993)
-8. L.A. Confidential (1997)
-9. Casablanca (1942)
-10. One Flew Over the Cuckoo's Nest (1975)
 
 ### Perbandingan Pendekatan
 
