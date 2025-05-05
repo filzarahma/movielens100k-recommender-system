@@ -172,6 +172,7 @@ def recommend_content(title, movies, cosine_sim=cosine_sim, movie_indices=movie_
 ```
 
 **Hasil Top-N Rekomendasi untuk "Toy Story (1995)":**
+
 ![image](https://github.com/user-attachments/assets/a81618c3-0e11-4681-a2f4-7c2612d58c8c)
 
 
@@ -211,6 +212,7 @@ def recommend_for_user(user_id, movies, ratings, cosine_sim, top_n=10):
     return pd.DataFrame(recommendations)
 ```
 **Hasil Top-N Rekomendasi untuk userId 255:**
+
 ![image](https://github.com/user-attachments/assets/80169726-65b7-43f8-b445-cbb9f4deef92)
 
 
@@ -265,6 +267,7 @@ def recommend_movies(user_id_original, model, movie_df, top_n=10):
 ```
 
 **Hasil Top-N Rekomendasi untuk User 255:**
+
 ![image](https://github.com/user-attachments/assets/b46a5a70-554b-4f14-8f20-98f3e7475ed6)
 
 
