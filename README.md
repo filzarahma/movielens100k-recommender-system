@@ -148,7 +148,7 @@ Dalam tahap data preparation, saya melakukan beberapa transformasi dan pembersih
 
 ### 1. Penggabungan Data
 
-Untuk mendapatkan dataset yang lengkap dan siap dianalisis, saya melakukan penggabungan (merge) antara dataset film dan dataset rating. Hasil penggabungan menghasilkan dataset dengan kolom-kolom: 'userId', 'movieId', 'rating', 'timestamp', 'title', dan 'genres'. Dataset gabungan ini memberikan informasi lengkap tentang setiap rating yang diberikan pengguna, termasuk judul dan genre film yang diberi rating. Penggabungan data ini tidak dimasukkan ke dalam pembuatan model, tetapi berguna untuk analisis lebih lanjut pada EDA.
+Untuk mendapatkan dataset yang lengkap dan siap dianalisis, saya melakukan penggabungan (merge) antara dataset film dan dataset rating. Hasil penggabungan menghasilkan dataset dengan kolom-kolom: 'userId', 'movieId', 'rating', 'timestamp', 'title', dan 'genres'. Dataset gabungan ini memberikan informasi lengkap tentang setiap rating yang diberikan pengguna, termasuk judul dan genre film yang diberi rating. Penggabungan data ini tidak dimasukkan ke dalam pembuatan model, tetapi berguna untuk analisis lebih lanjut pada EDA sebelumnya.
 
 ### 2. Feature Engineering
 
