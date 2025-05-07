@@ -148,7 +148,7 @@ Dalam tahap data preparation, saya melakukan beberapa transformasi dan pembersih
 
 ### 1. Penggabungan Data
 
-Untuk mendapatkan dataset yang lengkap dan siap dianalisis, saya melakukan penggabungan (merge) antara dataset film dan dataset rating. Hasil penggabungan menghasilkan dataset dengan kolom-kolom: 'userId', 'movieId', 'rating', 'timestamp', 'title', dan 'genres'. Dataset gabungan ini memberikan informasi lengkap tentang setiap rating yang diberikan pengguna, termasuk judul dan genre film yang diberi rating.
+Untuk mendapatkan dataset yang lengkap dan siap dianalisis, saya melakukan penggabungan (merge) antara dataset film dan dataset rating. Hasil penggabungan menghasilkan dataset dengan kolom-kolom: 'userId', 'movieId', 'rating', 'timestamp', 'title', dan 'genres'. Dataset gabungan ini memberikan informasi lengkap tentang setiap rating yang diberikan pengguna, termasuk judul dan genre film yang diberi rating. Penggabungan data ini tidak dimasukkan ke dalam pembuatan model, tetapi berguna untuk analisis lebih lanjut pada EDA.
 
 ### 2. Feature Engineering
 
@@ -182,11 +182,7 @@ Dalam proyek ini, saya mengembangkan dua model sistem rekomendasi: Content-Based
 
 ### 1. Content-Based Filtering
 
-Model ini merekomendasikan film berdasarkan kesamaan genre dengan film yang sudah disukai pengguna.
-
-#### Konsep Cosine Similarity
-
-Cosine Similarity adalah teknik untuk mengukur kesamaan antara dua vektor dengan menghitung kosinus sudut di antara keduanya. Dalam konteks sistem rekomendasi berbasis konten, setiap film direpresentasikan sebagai vektor fitur (dalam hal ini, vektor TF-IDF dari genre). Nilai cosine similarity berkisar antara -1 hingga 1, di mana:
+Model ini merekomendasikan film berdasarkan kesamaan genre dengan film yang sudah disukai pengguna. Melalui konsep tersebut, kita memanfaatkan teknik Cosine Similarity. Cosine Similarity adalah teknik untuk mengukur kesamaan antara dua vektor dengan menghitung kosinus sudut di antara keduanya. Dalam konteks sistem rekomendasi berbasis konten, setiap film direpresentasikan sebagai vektor fitur (dalam hal ini, vektor TF-IDF dari genre). Nilai cosine similarity berkisar antara -1 hingga 1, di mana:
 - 1 berarti kedua vektor memiliki arah yang sama (film sangat mirip)
 - 0 berarti kedua vektor tegak lurus (film tidak terkait)
 - -1 berarti kedua vektor berlawanan arah (film sangat berbeda)
@@ -215,11 +211,7 @@ Model ini juga dapat digunakan untuk memberikan rekomendasi personalisasi berdas
 
 ### 2. Collaborative Filtering
 
-Model kedua menggunakan pendekatan deep learning untuk mempelajari pola rating dan memberikan rekomendasi berdasarkan preferensi pengguna lain dengan selera serupa.
-
-#### Konsep RecommenderNet dalam Collaborative Filtering
-
-RecommenderNet adalah model deep learning sederhana yang mengimplementasikan Matrix Factorization melalui embedding. Konsep kerjanya:
+Model kedua menggunakan pendekatan deep learning untuk mempelajari pola rating dan memberikan rekomendasi berdasarkan preferensi pengguna lain dengan selera serupa. Algoritma yang digunakan pada pendekatan ini adalah RecommenderNet. RecommenderNet adalah model deep learning sederhana yang mengimplementasikan Matrix Factorization melalui embedding. Konsep kerjanya:
 
 1. **Embedding Layer**: Model memiliki dua embedding layer:
    - User Embedding: Memetakan ID pengguna ke vektor latent dimension (ruang tersembunyi)
