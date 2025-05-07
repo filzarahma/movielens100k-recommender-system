@@ -131,7 +131,8 @@ Genre film yang paling banyak diproduksi adalah Drama dan Comedy, masing-masing 
 
 #### 4. Distribusi Tahun Rilis
 
-![image](https://github.com/user-attachments/assets/ddb0b53e-5f42-4463-b259-7c432b19025b)
+![image](https://github.com/user-attachments/assets/33c5efde-2d91-4391-aaaa-1d09011fd8b6)
+
 
 
 Produksi film meningkat secara signifikan sejak tahun 1980-an dan mencapai puncaknya sekitar tahun 2000-an. Grafik ini mencerminkan tren pertumbuhan industri perfilman modern yang pesat dalam beberapa dekade terakhir.
