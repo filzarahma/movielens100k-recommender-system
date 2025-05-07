@@ -26,7 +26,7 @@ Tujuan dari proyek ini adalah:
 
 1. Mengembangkan sistem rekomendasi berbasis konten (content-based filtering) yang merekomendasikan film mirip berdasarkan kesamaan fitur (genre) dengan film yang disukai pengguna.
 2. Mengembangkan sistem rekomendasi berbasis kolaboratif (collaborative filtering) yang merekomendasikan film berdasarkan pola rating dari pengguna yang memiliki preferensi serupa.
-3. Mengevaluasi dan membandingkan performa kedua sistem rekomendasi tersebut menggunakan metrik evaluasi yang sesuai.
+3. Mengevaluasi dan membandingkan performa kedua sistem rekomendasi tersebut menggunakan Mean Squared Error (MSE) sebagai metrik evaluasi. MSE akan mengukur seberapa akurat model dalam memprediksi rating pengguna dengan menghitung rata-rata kuadrat selisih antara rating prediksi dan rating aktual. Semakin kecil nilai MSE, semakin baik performa model.
 
 ### Solution Approach
 
@@ -71,6 +71,35 @@ Dataset terdiri dari beberapa file, namun dalam proyek ini saya berfokus pada du
    - `movieId`: ID film yang diberi rating oleh pengguna
    - `rating`: Nilai rating yang diberikan pengguna (skala 0.5 hingga 5.0 dengan interval 0.5)
    - `timestamp`: Waktu ketika rating diberikan (dalam format UNIX timestamp)
+
+### Data Quality Analysis
+
+Sebelum melakukan penggabungan atau pengolahan data, penting untuk memastikan kualitas dataset yang digunakan:
+
+#### 1. Analisis Missing Values
+- **Dataset Film (movies.csv)**:
+  - `movieId`: 0 missing values
+  - `title`: 0 missing values
+  - `genres`: 0 missing values (terdapat 18 film dengan genre "no genres listed")
+
+- **Dataset Rating (ratings.csv)**:
+  - `userId`: 0 missing values
+  - `movieId`: 0 missing values
+  - `rating`: 0 missing values
+  - `timestamp`: 0 missing values
+
+#### 2. Analisis Duplikasi Data
+- **Dataset Film**: Tidak ditemukan data duplikat berdasarkan `movieId` (primary key)
+- **Dataset Rating**: Tidak ditemukan duplikasi data dengan kombinasi `userId` dan `movieId` yang sama (satu pengguna hanya memberikan satu rating untuk satu film)
+
+#### 3. Analisis Outlier
+- **Dataset Film**: Tidak terdeteksi outlier yang signifikan pada tahun rilis film
+- **Dataset Rating**:
+  - Distribusi rating cenderung normal dengan sedikit kemiringan positif
+  - Tidak terdapat outlier yang signifikan karena rating dibatasi pada skala 0.5 hingga 5.0
+  - Beberapa film memiliki banyaknya rating jauh di atas rata-rata (> 500 rating), yang menunjukkan popularitas film tersebut
+
+Hasil analisis menunjukkan bahwa kedua dataset memiliki kualitas data yang baik tanpa masalah missing value atau duplikasi yang perlu ditangani dalam tahap preprocessing.
 
 ### Exploratory Data Analysis
 
@@ -117,9 +146,9 @@ Genre Film-Noir menempati posisi teratas dengan rata-rata rating tertinggi, disu
 
 Dalam tahap data preparation, saya melakukan beberapa transformasi dan pembersihan data untuk memastikan data siap digunakan dalam pengembangan model. Berikut adalah langkah-langkah yang dilakukan:
 
-### 1. Eksplorasi Dasar dan Pemeriksaan Data
+### 1. Penggabungan Data
 
-Tahapan ini penting untuk memastikan kualitas data yang akan digunakan. Hasil menunjukkan bahwa kedua dataset (film dan rating) tidak memiliki data duplikat atau nilai yang hilang, sehingga tidak diperlukan penanganan khusus untuk masalah tersebut.
+Untuk mendapatkan dataset yang lengkap dan siap dianalisis, saya melakukan penggabungan (merge) antara dataset film dan dataset rating. Hasil penggabungan menghasilkan dataset dengan kolom-kolom: 'userId', 'movieId', 'rating', 'timestamp', 'title', dan 'genres'. Dataset gabungan ini memberikan informasi lengkap tentang setiap rating yang diberikan pengguna, termasuk judul dan genre film yang diberi rating.
 
 ### 2. Feature Engineering
 
@@ -131,7 +160,21 @@ Tahapan feature engineering dilakukan untuk memperkaya informasi dalam dataset:
   
 - **Perhitungan Jumlah Genre**: Menambahkan fitur yang menunjukkan berapa banyak genre yang dimiliki oleh setiap film, yang dapat mengindikasikan kompleksitas atau keberagaman film.
 
-Transformasi ini penting untuk analisis yang lebih mendalam dan meningkatkan kualitas fitur yang tersedia untuk model rekomendasi.
+### 3. Encoding Fitur Genre dengan TF-IDF
+
+Untuk menggunakan informasi genre dalam content-based filtering, kita perlu mengubah data teks genre menjadi representasi numerik. Pendekatan yang digunakan adalah Term Frequency-Inverse Document Frequency (TF-IDF).
+
+Hasil dari proses ini adalah matriks TF-IDF dengan dimensi (jumlah film × jumlah genre unik), di mana setiap baris merepresentasikan satu film dan setiap kolom merepresentasikan bobot TF-IDF untuk genre tertentu. Matriks ini kemudian akan digunakan untuk menghitung similaritas antar film berdasarkan genre mereka.
+
+### 4. Normalisasi Rating
+
+Untuk model collaborative filtering, rating pengguna dinormalisasi untuk meningkatkan performa model dengan menskala nilai rating ke rentang [0,1].
+
+### 5. Train-Test Split
+
+Data dibagi menjadi set pelatihan dan pengujian dengan proporsi 80:20 untuk evaluasi model.
+
+Transformasi-transformasi ini penting untuk analisis yang lebih mendalam dan meningkatkan kualitas fitur yang tersedia untuk model rekomendasi.
 
 ## Modeling and Result
 
@@ -139,137 +182,63 @@ Dalam proyek ini, saya mengembangkan dua model sistem rekomendasi: Content-Based
 
 ### 1. Content-Based Filtering
 
-Model ini merekomendasikan film berdasarkan kesamaan genre dengan film yang sudah disukai pengguna. Implementasinya sebagai berikut:
+Model ini merekomendasikan film berdasarkan kesamaan genre dengan film yang sudah disukai pengguna.
 
-```python
-# TF-IDF pada data genre film
-tfidf = TfidfVectorizer(token_pattern=r'[^|]+')
-tfidf_matrix = tfidf.fit_transform(movies_df['genres'])
+#### Konsep Cosine Similarity
 
-# Menghitung similaritas kosinus antara semua film
-cosine_sim = cosine_similarity(tfidf_matrix)
+Cosine Similarity adalah teknik untuk mengukur kesamaan antara dua vektor dengan menghitung kosinus sudut di antara keduanya. Dalam konteks sistem rekomendasi berbasis konten, setiap film direpresentasikan sebagai vektor fitur (dalam hal ini, vektor TF-IDF dari genre). Nilai cosine similarity berkisar antara -1 hingga 1, di mana:
+- 1 berarti kedua vektor memiliki arah yang sama (film sangat mirip)
+- 0 berarti kedua vektor tegak lurus (film tidak terkait)
+- -1 berarti kedua vektor berlawanan arah (film sangat berbeda)
 
-def recommend_content(title, movies, cosine_sim=cosine_sim, movie_indices=movie_indices):
-    # Ambil index film input
-    idx = movie_indices[title]
-    
-    # Hitung kemiripan
-    sim_scores = list(enumerate(cosine_sim[idx]))
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-    sim_scores = sim_scores[1:11]  # 10 teratas (selain dirinya sendiri)
-    
-    # Ambil informasi film rekomendasi
-    results = []
-    for i, score in sim_scores:
-        row = movies.iloc[i]
-        results.append({
-            "Title": row['title'],
-            "Genres": row['genres'],
-            "Similarity": round(score, 3)
-        })
-    
-    return pd.DataFrame(results)
-```
+Rumus cosine similarity:
+$$\cos(\theta) = \frac{A \cdot B}{||A|| \times ||B||}$$
+
+Dimana:
+- A · B adalah dot product dari vektor A dan B
+- ||A|| dan ||B|| adalah magnitude (panjang) dari vektor A dan B
+
+Cosine similarity memiliki peran penting dalam CBF karena:
+1. Dapat menangkap kesamaan makna semantik meskipun panjang vektor berbeda
+2. Fokus pada arah vektor, bukan besarannya, sehingga cocok untuk rekomendasi berbasis kesamaan
+3. Efisien untuk komputasi pada data sparse (banyak nilai nol) seperti representasi genre
 
 **Hasil Top-N Rekomendasi untuk "Toy Story (1995)":**
 
 ![image](https://github.com/user-attachments/assets/a81618c3-0e11-4681-a2f4-7c2612d58c8c)
 
+Model ini juga dapat digunakan untuk memberikan rekomendasi personalisasi berdasarkan seluruh riwayat rating pengguna.
 
-Model ini juga dapat digunakan untuk memberikan rekomendasi personalisasi berdasarkan seluruh riwayat rating pengguna:
-
-```python
-def recommend_for_user(user_id, movies, ratings, cosine_sim, top_n=10):
-    # Gabungkan movies dan ratings
-    user_data = ratings[ratings['userId'] == user_id]
-    
-    # Ambil film dengan rating tinggi
-    liked_movies = user_data[user_data['rating'] >= 3.5]
-    
-    # Hitung kemiripan rata-rata antara film yang disukai user dengan semua film
-    sim_scores = cosine_sim[liked_movie_indices]
-    sim_scores = sim_scores.mean(axis=0)
-    
-    # Urutkan skor similarity
-    sim_scores = list(enumerate(sim_scores))
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-    
-    # Siapkan list rekomendasi (film yang belum ditonton)
-    watched_movie_ids = set(user_data['movieId'])
-    recommendations = []
-    
-    for idx, score in sim_scores:
-        movie_id = movies.iloc[idx]['movieId']
-        if movie_id not in watched_movie_ids:
-            recommendations.append({
-                'Title': movies.iloc[idx]['title'],
-                'Genres': movies.iloc[idx]['genres'],
-                'Similarity': round(score, 3)
-            })
-        if len(recommendations) >= top_n:
-            break
-    
-    return pd.DataFrame(recommendations)
-```
 **Hasil Top-N Rekomendasi untuk userId 255:**
 
 ![image](https://github.com/user-attachments/assets/80169726-65b7-43f8-b445-cbb9f4deef92)
 
-
 ### 2. Collaborative Filtering
 
-Model kedua menggunakan pendekatan deep learning untuk mempelajari pola rating dan memberikan rekomendasi berdasarkan preferensi pengguna lain dengan selera serupa:
+Model kedua menggunakan pendekatan deep learning untuk mempelajari pola rating dan memberikan rekomendasi berdasarkan preferensi pengguna lain dengan selera serupa.
 
-```python
-class RecommenderNet(tf.keras.Model):
-    def __init__(self, num_users, num_movies, embedding_size=50, **kwargs):
-        super(RecommenderNet, self).__init__(**kwargs)
-        self.user_embedding = tf.keras.layers.Embedding(num_users, embedding_size)
-        self.movie_embedding = tf.keras.layers.Embedding(num_movies, embedding_size)
-        self.dot = tf.keras.layers.Dot(axes=1)
-        
-    def call(self, inputs):
-        user_vector = self.user_embedding(inputs[:, 0])
-        movie_vector = self.movie_embedding(inputs[:, 1])
-        return self.dot([user_vector, movie_vector])
+#### Konsep RecommenderNet dalam Collaborative Filtering
 
-# Kompilasi dan Pelatihan Model
-model = RecommenderNet(num_users, num_movies)
-model.compile(optimizer='adam', loss='mae', metrics=['mse'])
+RecommenderNet adalah model deep learning sederhana yang mengimplementasikan Matrix Factorization melalui embedding. Konsep kerjanya:
 
-history = model.fit(x=x_train, y=y_train, 
-                    validation_data=(x_test, y_test),
-                    batch_size=64, epochs=10, verbose=1)
-```
+1. **Embedding Layer**: Model memiliki dua embedding layer:
+   - User Embedding: Memetakan ID pengguna ke vektor latent dimension (ruang tersembunyi)
+   - Movie Embedding: Memetakan ID film ke vektor latent dimension yang sama
 
-Fungsi untuk menghasilkan rekomendasi:
+2. **Latent Space**: Model mempelajari representasi pengguna dan film dalam ruang laten berdimensi rendah (dalam contoh ini 50 dimensi). Dalam ruang laten ini:
+   - Pengguna dengan preferensi serupa akan memiliki vektor embedding berdekatan
+   - Film dengan karakteristik serupa akan memiliki vektor embedding berdekatan
+   - Kedekatan vektor pengguna dan film mengindikasikan potensi kecocokan
 
-```python
-def recommend_movies(user_id_original, model, movie_df, top_n=10):
-    user_idx = user_to_index[user_id_original]
-    
-    # Dapatkan semua indeks film
-    movie_indices = np.arange(len(movie_ids))
-    
-    # Buat kombinasi input antara pengguna dengan semua film
-    user_input = np.array([[user_idx, movie] for movie in movie_indices])
-    
-    # Prediksi rating
-    predicted_ratings = model.predict(user_input).flatten()
-    
-    # Urutkan berdasarkan rating
-    top_indices = predicted_ratings.argsort()[-top_n:][::-1]
-    top_movie_ids = [movie_ids[i] for i in top_indices]
-    
-    # Dapatkan judul film
-    recommended_titles = movie_df[movie_df['movieId'].isin(top_movie_ids)]['title'].tolist()
-    return recommended_titles
-```
+3. **Dot Product**: Interaksi pengguna-film dimodelkan sebagai dot product antara vektor embedding pengguna dan film. Nilai dot product yang tinggi menunjukkan kecocokan yang tinggi antara preferensi pengguna dan karakteristik film.
+
+4. **Pembelajaran**: Model belajar dengan meminimalkan selisih antara rating prediksi (hasil dot product) dengan rating aktual yang diberikan pengguna.
+
+Keunggulan model ini adalah kemampuannya untuk menemukan pola tersembunyi dalam data rating tanpa memerlukan fitur konten eksplisit, hanya berdasarkan interaksi pengguna-film sebelumnya.
 
 **Hasil Top-N Rekomendasi untuk User 255:**
 
 ![image](https://github.com/user-attachments/assets/b46a5a70-554b-4f14-8f20-98f3e7475ed6)
-
 
 ### Perbandingan Pendekatan
 
@@ -313,21 +282,10 @@ MSE memberikan bobot lebih pada error yang besar karena mengkuadratkan selisih. 
 ### 2. Hasil Evaluasi
 
 **Content-Based Filtering:**
-```python
-mse_content = mean_squared_error(y_true, y_pred)
-print("MSE Content-Based:", mse_content)
-# MSE Content-Based: 0.03
-```
+MSE Content-Based: 0.03
 
 **Collaborative Filtering:**
-```python
-y_test_pred = model.predict(x_test).flatten()
-y_test_pred_scaled = y_test_pred * 5.0
-y_test_scaled = y_test * 5.0
-mse_collab = mean_squared_error(y_test_scaled, y_test_pred_scaled)
-print("MSE Collaborative Filtering:", mse_collab)
-# MSE Collaborative Filtering: 1.39
-```
+MSE Collaborative Filtering: 1.39
 
 ### 3. Analisis Hasil
 
