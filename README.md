@@ -155,11 +155,13 @@ Untuk mendapatkan dataset yang lengkap dan siap dianalisis, saya melakukan pengg
 
 Tahapan feature engineering dilakukan untuk memperkaya informasi dalam dataset:
 
-- **Ekstraksi Tahun**: Mengekstrak tahun rilis film dari judul menggunakan ekspresi reguler. Fitur ini memungkinkan analisis berdasarkan periode waktu dan melihat tren historis.
-  
-- **Penambahan Rating Rata-rata**: Menghitung rating rata-rata dan jumlah rating untuk setiap film, yang memberikan informasi tentang popularitas dan penerimaan film.
-  
-- **Perhitungan Jumlah Genre**: Menambahkan fitur yang menunjukkan berapa banyak genre yang dimiliki oleh setiap film, yang dapat mengindikasikan kompleksitas atau keberagaman film.
+- **Ekstraksi Tahun** - Mengekstrak tahun rilis film dari judul menggunakan ekspresi reguler untuk analisis tren dan pola berdasarkan waktu.
+
+- **Penambahan Rating Rata-rata** - Menghitung rating rata-rata dan jumlah rating untuk setiap film, lalu menggabungkannya dengan dataset film. Ini membantu dalam mengidentifikasi film populer dan yang disukai pengguna.
+
+- **Perhitungan Jumlah Genre** - Menambahkan fitur yang menunjukkan berapa banyak genre yang dimiliki oleh setiap film. Film dengan genre lebih banyak mungkin memiliki karakteristik berbeda dengan film dengan genre tunggal.
+
+- **Analisis Genre** - Membuat daftar semua genre yang ada dalam dataset dan menghitung frekuensinya untuk distribusi genre dalam koleksi film.
 
 ### 3. Encoding Fitur Genre dengan TF-IDF
 
